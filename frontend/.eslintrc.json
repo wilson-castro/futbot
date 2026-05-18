@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "eslint:recommended",
+    "plugin:import/recommended",
+    "prettier"
+  ],
+  "plugins": [
+    "simple-import-sort"
+  ],
+  "rules": {
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "import/order": "off",
+    "react/react-in-jsx-scope": "off"
+  }
+}
