@@ -1,0 +1,45 @@
+# 🚀 DEPRECATED - Use ../../docker/docker-compose.yml instead
+#
+# Este arquivo foi consolidado para a pasta ../../docker/
+# para evitar repetição e facilitar manutenção.
+#
+# Novo caminho:
+#   cd ../../docker
+#   docker-compose up --build
+#
+# Ou da raiz:
+#   docker-compose up --build
+
+version: '3.9'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: always
+    ports:
+      - '11434:11434'
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: '24h'
+      OLLAMA_NUM_PARALLEL: '4'
+      OLLAMA_MAX_LOADED_MODELS: '2'
+
+  api:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    container_name: futbot-api
+    restart: always
+    ports:
+      - '8001:8001'
+    environment:
+      OLLAMA_URL: http://ollama:11434
+      MODEL_NAME: qwen2.5:1.5b
+      NODE_ENV: production
+    depends_on:
+      - ollama
+
+volumes:
+  ollama_data:
