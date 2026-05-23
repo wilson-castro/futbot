@@ -1,0 +1,11 @@
+node_modules
+.next
+
+**/*.md
+
+!README.md
+!API.md
+!ARCHITECTURE.md
+!QUICKSTART.md
+!VALIDATION.md
+!IMPLEMENTATION.md
