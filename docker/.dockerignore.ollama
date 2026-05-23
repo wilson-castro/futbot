@@ -1,0 +1,12 @@
+# ============ OLLAMA .dockerignore ============
+.git
+.gitignore
+.DS_Store
+*.log
+
+# ============ IDE ============
+.vscode
+.idea
+
+# ============ OS ============
+Thumbs.db

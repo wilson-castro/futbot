@@ -1,0 +1,86 @@
+version: '3.9'
+
+x-common-variables: &common-variables
+  NODE_ENV: ${NODE_ENV:-development}
+  OLLAMA_URL: http://ollama:11434
+  MODEL_NAME: ${MODEL_NAME:-qwen2.5:1.5b}
+
+services:
+  ollama:
+    image: ollama/ollama:${OLLAMA_VERSION:-latest}
+    container_name: ${PROJECT_NAME:-futbot}-ollama
+    restart: always
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-24h}
+      OLLAMA_NUM_PARALLEL: ${OLLAMA_NUM_PARALLEL:-4}
+      OLLAMA_MAX_LOADED_MODELS: ${OLLAMA_MAX_LOADED_MODELS:-2}
+    networks:
+      - futbot-network
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /root/.ollama/id_ed25519 ] || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  backend:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV:-development}
+    image: ${PROJECT_NAME:-futbot}-backend:${VERSION:-latest}
+    container_name: ${PROJECT_NAME:-futbot}-backend
+    restart: always
+    ports:
+      - "${BACKEND_PORT:-8001}:8001"
+    environment:
+      <<: *common-variables
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - futbot-network
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:8001', (res) => process.exit(0))\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_WS_URL: ws://localhost:${BACKEND_PORT:-8001}/v1/ws/chat
+    image: ${PROJECT_NAME:-futbot}-frontend:${VERSION:-latest}
+    container_name: ${PROJECT_NAME:-futbot}-frontend
+    restart: always
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      NEXT_PUBLIC_WS_URL: ws://localhost:${BACKEND_PORT:-8001}/v1/ws/chat
+      NODE_ENV: ${NODE_ENV:-development}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - futbot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  futbot-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
+    driver: local
