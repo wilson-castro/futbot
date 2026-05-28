@@ -1,0 +1,8 @@
+FROM ollama/ollama:latest
+
+# Copia o script de inicialização
+COPY docker/ollama-init.sh /ollama-init.sh
+RUN chmod +x /ollama-init.sh
+
+# Define o script como entrypoint
+ENTRYPOINT ["/ollama-init.sh"]
