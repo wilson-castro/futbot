@@ -1,33 +1,25 @@
-import cors from '@fastify/cors';
 import websocket from '@fastify/websocket';
-import dotenv from 'dotenv';
+import 'dotenv/config'; // Loads variables immediately
 import Fastify from 'fastify';
 
-import { registerChatSocket } from './websocket/chat.socket';
-import { warmupModel } from './services/ollama.service';
-
-dotenv.config();
+import { registerChatSocket } from './sockets/chat.socket.ts';
 
 const app = Fastify({
   logger: true,
 });
 
-async function bootstrap() {
+await app.register(websocket);
 
-  await warmupModel();
+app.get(
+  '/chat',
+  { websocket: true },
 
-  await app.register(cors, {
-    origin: true,
-  });
+  (socket) => {
+    registerChatSocket(socket);
+  }
+);
 
-  await app.register(websocket);
-
-  registerChatSocket(app);
-
-  await app.listen({
-    host: '0.0.0.0',
-    port: 8001,
-  });
-}
-
-bootstrap();
+app.listen({
+  port: 8081,
+  host: '0.0.0.0',
+});

@@ -158,7 +158,7 @@ describe('Backend Esportivo - Testes de Integração', () => {
 
   // ============ TESTES: CHAT ENDPOINT - MENSAGENS ESPORTIVAS ============
 
-  describe('POST /api/chat - Mensagens Esportivas (com Gemini AI)', () => {
+  describe('POST /api/chat - Mensagens Esportivas', () => {
     it('Deve responder a pergunta sobre jogos de hoje', async () => {
       const response = await request(app).post('/api/chat').send({
         message: 'Qual é o resultado da partida de futebol de hoje?',

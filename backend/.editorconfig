@@ -12,7 +12,7 @@ max_line_length = 120
 
 [*.{js,ts,jsx,tsx}]
 # Match Prettier: single quotes
-quote_type = single
+quote_type = singe
 
 [*.json]
 # JSON should always use double quotes

@@ -2,7 +2,10 @@ node_modules
 npm-debug.log
 dist
 build
+.husky
 .env.local
+.env.example
+.env.*.example
 .env.*.local
 .git
 .gitignore
