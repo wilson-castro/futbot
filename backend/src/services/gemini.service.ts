@@ -68,28 +68,30 @@ export async function streamFootballResponse(
   userQuestion: string,
   onToken: (token: string) => void
 ) {
-  const stream = await ai.models.generateContentStream({
-    model: env.geminiModel,
+  const chat = await ai.chats
+    .create({
+      model: env.geminiModel,
+      config: {
+        temperature: env.temperature,
+        systemInstruction: SYSTEM_PROMPT,
+        tools: [
+          {
+            googleSearch: {},
+          },
+        ],
+      },
+    })
+    .sendMessage({
+      message: userQuestion,
+    });
 
-    contents: userQuestion,
-
-    config: {
-      temperature: env.temperature,
-
-      systemInstruction: SYSTEM_PROMPT,
-
-      tools: [
-        {
-          googleSearch: {},
-        },
-      ],
-    },
-  });
-  const responseQueue: string[] = [];
-  for await (const chunk of stream) {
-    if (chunk.text) {
-      responseQueue.push(chunk.text);
-    }
+  if (!chat) {
+    throw new Error('Failed to create chat session');
   }
-  onToken(responseQueue.join(''));
+
+  if (!chat.text) {
+    throw new Error('Failed to get response from chat session');
+  }
+
+  onToken(chat.text);
 }
