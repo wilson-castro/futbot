@@ -2,12 +2,24 @@ import type { WebSocket } from '@fastify/websocket';
 
 import { classifyInput } from '../services/classifier.service.ts';
 
+import { env } from '../config/env.ts';
 import { streamFootballResponse } from '../services/gemini.service.ts';
 
 export function registerChatSocket(socket: WebSocket) {
   socket.on('message', async (rawMessage) => {
     try {
       const message = rawMessage.toString();
+
+      if (message.length > env.maxPromptLength) {
+        socket.send(
+          JSON.stringify({
+            type: 'error',
+            message: `A mensagem excede o limite de ${env.maxPromptLength} caracteres.`,
+          })
+        );
+
+        return;
+      }
       // const security = analyzeRequest(message);
 
       // if (!security.allowed) {

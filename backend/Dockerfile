@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine as builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -24,9 +24,9 @@ RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 8001
+EXPOSE 8081
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:8001', (res) => { if (res.statusCode !== 404) throw new Error(res.statusCode) })"
+  CMD node -e "require('http').get('http://localhost:8081', (res) => { if (res.statusCode !== 404) throw new Error(res.statusCode) })"
 
 CMD ["node", "dist/server.js"]

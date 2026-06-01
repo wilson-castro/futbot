@@ -9,3 +9,5 @@ node_modules
 !QUICKSTART.md
 !VALIDATION.md
 !IMPLEMENTATION.md
+
+.env
