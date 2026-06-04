@@ -1,32 +1,30 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
+
+WORKDIR /app
+
+COPY backend/package*.json ./
+RUN npm ci
+
+COPY backend/tsconfig.json backend/tsconfig.build.json ./
+COPY backend/src ./src
+
+RUN ./node_modules/.bin/tsc -p tsconfig.build.json
+RUN cp -r src/data dist/data
+
+# Production stage
+FROM node:24-alpine
 
 WORKDIR /app
 
 COPY backend/package*.json ./
 RUN npm install
 
-COPY backend/tsconfig.json ./
-COPY backend/src ./src
-
-RUN npm run build
-
-# Production stage
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Copiar .dockerignore
-COPY .dockerignore.backend .dockerignore
-
-COPY backend/package*.json ./
-RUN npm install --omit=dev
-
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 8081
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:8081', (res) => { if (res.statusCode !== 404) throw new Error(res.statusCode) })"
+  CMD node -e "require('http').get('http://localhost:8081', () => process.exit(0)).on('error', () => process.exit(1))"
 
 CMD ["node", "dist/server.js"]

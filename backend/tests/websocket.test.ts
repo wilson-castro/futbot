@@ -11,7 +11,7 @@
 import WebSocket from 'ws';
 
 describe('WebSocket Chat - Testes de Integração', () => {
-  const WS_URL = 'ws://localhost:8001/v1/ws/chat';
+  const WS_URL = 'http://127.0.0.1:8081/v1/chat';
   let ws: WebSocket;
 
   beforeEach(done => {

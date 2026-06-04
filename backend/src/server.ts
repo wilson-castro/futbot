@@ -11,7 +11,7 @@ const app = Fastify({
 await app.register(websocket);
 
 app.get(
-  '/chat',
+  '/v1/chat',
   { websocket: true },
 
   (socket) => {
