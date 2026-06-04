@@ -8,32 +8,33 @@ services:
     container_name: futbot-backend
     restart: always
     ports:
-      - "${BACKEND_PORT:-8081}:8081"
+      - "${BACKEND_PORT:-8001}:8081"
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       GOOGLE_API_KEY: ${GOOGLE_API_KEY}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.0-flash-lite}
-      TEMPERATURE: ${TEMPERATURE:-0.7}
-      CLASSIFIER_MODEL: ${CLASSIFIER_MODEL:-gemini-2.0-flash-lite}
+      GEMINI_CLASSIFIER_MODEL: ${GEMINI_CLASSIFIER_MODEL:-gemini-2.0-flash-lite}
+      GEMINI_TEMPERATURE: ${GEMINI_TEMPERATURE:-0.3}
+      ENABLE_GOOGLE_SEARCH: ${ENABLE_GOOGLE_SEARCH:-false}
     networks:
       - futbot-network
     healthcheck:
-      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:8081', (res) => process.exit(0))\" || exit 1"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8081', () => process.exit(0)).on('error', () => process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 5s
+      start_period: 10s
 
   frontend:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-http://127.0.0.1:8081/v1/chat}
     container_name: futbot-frontend
     restart: always
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
-    environment:
-      NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:8081/v1/ws/chat}
     depends_on:
       backend:
         condition: service_healthy
