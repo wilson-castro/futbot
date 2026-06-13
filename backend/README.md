@@ -59,9 +59,14 @@ npm start
 
 ### Docker
 
+O `docker-compose.yml` sobe backend + frontend juntos e fica na **raiz** do projeto:
+
 ```bash
-docker-compose up --build
+cd ..                    # raiz do repositório
+docker compose up --build
 ```
+
+Consulte o [README da raiz](../README.md) para detalhes de ambientes e configuração de portas.
 
 ## 📁 Estrutura do Projeto
 
@@ -85,8 +90,15 @@ backend/
 │       ├── competitions.json   # Lista de competições
 │       └── football_terms.json # Termos de futebol
 ├── tests/
-│   ├── api.test.ts            # Testes da API
-│   └── websocket.test.ts      # Testes do WebSocket
+│   ├── setup.ts               # Injeta env vars antes dos imports
+│   ├── unit/                  # Testes unitários (Gemini mockado)
+│   │   ├── prompt-sanitizer.test.ts
+│   │   ├── football-filter.test.ts
+│   │   ├── security-analyzer.test.ts
+│   │   ├── classifier.service.test.ts
+│   │   └── gemini.service.test.ts
+│   └── integration/
+│       └── chat.socket.test.ts # Fastify + WebSocket reais, serviços mockados
 ├── package.json
 ├── tsconfig.json
 ├── jest.config.ts
@@ -112,7 +124,7 @@ npm run prepare          # Setup de husky (git hooks)
 
 ### Conectar
 ```javascript
-const ws = new WebSocket('ws://localhost:8081/chat');
+const ws = new WebSocket('ws://localhost:8081/v1/chat');
 ```
 
 ### Enviar Mensagem
@@ -187,16 +199,27 @@ ENABLE_CHAT_HISTORY=true       # Histórico de conversa
 
 ## 🧪 Testes
 
+Os testes usam **Jest + ts-jest** e **não fazem chamadas externas**: a API do
+Gemini (`@google/genai`) é mockada nos testes unitários e os serviços de
+classificação/geração são mockados no teste de integração do WebSocket. Não é
+necessário `GOOGLE_API_KEY` real nem servidor rodando.
+
 ```bash
-# Executar todos os testes
+# Executar todos os testes (unitários + integração)
 npm test
 
 # Modo watch
-npm test -- --watch
+npm run test:watch
 
 # Com cobertura
-npm test -- --coverage
+npm run test:coverage
 ```
+
+- **Unitários** (`tests/unit/`): sanitização de prompt injection, filtro de
+  contexto de futebol, analisador de segurança e os serviços do Gemini.
+- **Integração** (`tests/integration/`): sobe um Fastify real com
+  `@fastify/websocket`, conecta um cliente WebSocket e valida o fluxo de
+  streaming, bloqueios e limites — com os serviços do Gemini mockados.
 
 ## 📦 Build e Deploy
 
@@ -229,8 +252,9 @@ docker run -p 8081:8081 \
 - Verifique se a chave da API é válida
 
 ### Conexão WebSocket falha
-- Verifique se o servidor está rodando em `localhost:8081`
+- Verifique se o servidor está rodando em `localhost:8081` e que o caminho é `/v1/chat`
 - Confira se a porta não está bloqueada por firewall
+- Em Docker, conecte na porta externa (`BACKEND_PORT`, padrão `8001`), não na `8081` interna
 - Em produção, use `wss://` (WebSocket Secure)
 
 ### Respostas lentas do Gemini
