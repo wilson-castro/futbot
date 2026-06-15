@@ -1,0 +1,6 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,Latency,IdleTime,Connect
+1781553433156,14,Abrir conexao WebSocket,Websocket I/O error,WebSocket I/O error: Connection refused,Torcedores simultaneos 1-1,,false,,0,0,1,1,0,0,0
+0,0,Enviar pergunta e ler primeiro retorno,Sampler error,"Sampler configured for using existing connection, but there is no connection",Torcedores simultaneos 1-1,,false,Response was null,0,0,1,1,0,0,0
+0,0,Ler proximo frame do stream (opcional),Sampler error,"Sampler configured for using existing connection, but there is no connection",Torcedores simultaneos 1-1,,false,,0,0,1,1,0,0,0
+0,0,Fechar conexao WebSocket,,No connection; nothing to close.,Torcedores simultaneos 1-1,,false,,0,0,1,1,0,0,0
+1781553433149,14,Conversa completa,,"Number of samples in transaction : 4, number of failing samples : 4",Torcedores simultaneos 1-1,,false,,0,0,1,1,0,11,0
