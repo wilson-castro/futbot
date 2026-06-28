@@ -5,6 +5,7 @@ import {
   markError,
   markInterrupted,
   parseServerPayload,
+  setMessageText,
 } from "./messageHandlers";
 
 const bot = (id: string, text = ""): Message => ({ id, text, sender: "bot" });
@@ -39,6 +40,28 @@ describe("appendToken", () => {
   it("não altera quando a última mensagem não é do bot", () => {
     const messages = [bot("b1", "Olá"), user("u1", "oi")];
     expect(appendToken(messages, "x", "u1")).toEqual(messages);
+  });
+});
+
+describe("setMessageText", () => {
+  it("substitui o texto da mensagem do bot sem marcar erro", () => {
+    const messages = [bot("b1", "")];
+    const result = setMessageText(messages, "Só falo de futebol.", "b1");
+    expect(result.at(-1)).toEqual({
+      id: "b1",
+      text: "Só falo de futebol.",
+      sender: "bot",
+    });
+  });
+
+  it("não altera quando o id não casa", () => {
+    const messages = [bot("b1", "")];
+    expect(setMessageText(messages, "x", "outro")).toEqual(messages);
+  });
+
+  it("não altera quando a última mensagem não é do bot", () => {
+    const messages = [bot("b1", ""), user("u1", "oi")];
+    expect(setMessageText(messages, "x", "u1")).toEqual(messages);
   });
 });
 

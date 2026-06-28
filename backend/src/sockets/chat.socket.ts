@@ -14,7 +14,7 @@ export function registerChatSocket(socket: WebSocket) {
         socket.send(
           JSON.stringify({
             type: 'error',
-            message: `A mensagem excede o limite de ${env.maxPromptLength} caracteres.`,
+            message: `Opa, sua mensagem ficou um pouco longa! Tente encurtar para até ${env.maxPromptLength} caracteres. 🙂`,
           })
         );
 
@@ -39,7 +39,7 @@ export function registerChatSocket(socket: WebSocket) {
         socket.send(
           JSON.stringify({
             type: 'error',
-            message: 'Tentativa de prompt injection detectada.',
+            message: 'Hmm, essa mensagem parece tentar mudar meu funcionamento. 😅 Bora falar de futebol?',
           })
         );
 
@@ -50,7 +50,7 @@ export function registerChatSocket(socket: WebSocket) {
         socket.send(
           JSON.stringify({
             type: 'message',
-            message: 'Posso responder apenas perguntas relacionadas ao futebol.',
+            message: 'Opa! Eu só manjo de futebol. 😅 Me pergunta algo sobre o esporte!',
           })
         );
 
@@ -81,7 +81,7 @@ export function registerChatSocket(socket: WebSocket) {
       socket.send(
         JSON.stringify({
           type: 'error',
-          message: 'Erro interno.',
+          message: 'Eita, deu um probleminha aqui. 😬 Tenta de novo daqui a pouco!',
         })
       );
     }

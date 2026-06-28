@@ -6,7 +6,8 @@ import {
   appendToken,
   markError,
   markInterrupted,
-  parseServerPayload
+  parseServerPayload,
+  setMessageText
 } from "@/lib/websocket/messageHandlers";
 import { getReconnectDelay } from "@/lib/websocket/reconnect";
 import { getWebSocketUrl } from "@/lib/websocket/url";
@@ -54,6 +55,12 @@ export function useWebSocket(): UseWebSocketReturn {
 
           if (payload.type === "token" && payload.content && botId) {
             setMessages((prev) => appendToken(prev, payload.content!, botId));
+          } else if (payload.type === "message" && botId) {
+            setMessages((prev) =>
+              setMessageText(prev, payload.message ?? "", botId)
+            );
+            setIsLoading(false);
+            currentBotIdRef.current = null;
           } else if (payload.type === "done") {
             setIsLoading(false);
             currentBotIdRef.current = null;

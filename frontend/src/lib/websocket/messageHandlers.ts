@@ -22,6 +22,14 @@ export function appendToken(messages: Message[], token: string, targetId: string
   return messages;
 }
 
+export function setMessageText(messages: Message[], text: string, targetId: string): Message[] {
+  const last = messages.at(-1);
+  if (last?.sender === "bot" && last.id === targetId) {
+    return [...messages.slice(0, -1), { ...last, text }];
+  }
+  return messages;
+}
+
 export function markError(messages: Message[], errorText: string, targetId: string): Message[] {
   const last = messages.at(-1);
   if (last?.id === targetId) {
